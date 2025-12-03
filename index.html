@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Питомцы — Найдите своего друга</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #eee;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+    }
+    .hero {
+      padding: 80px 40px;
+      text-align: center;
+      background: #fafafa;
+    }
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+    .search-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .search-box input {
+      padding: 12px;
+      width: 260px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .btn {
+      padding: 12px 20px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .section {
+      padding: 60px 40px;
+    }
+    .section h2 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .card {
+      background: #fff;
+      border: none;
+      border-radius: 26px;
+      overflow: hidden;
+      padding-bottom: 10px;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .card img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
+      display: block;
+    }
+    .card-content {
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .card-info {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 12px;
+    }
+    footer {
+      padding: 40px;
+      text-align: center;
+      border-top: 1px solid #eee;
+      margin-top: 40px;
+      color: #666;
+      font-size: 14px;
+    }
+    .slider {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      overflow: hidden;
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
+      background: #f6f6f6;
+    }
+    .slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s ease;
+    }
+    .slides img {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+    }
+    .prev, .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      border: none;
+      font-size: 26px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+    .prev { left: 10px; }
+    .next { right: 10px; }
+    .prev:hover, .next:hover {
+      background: rgba(0,0,0,0.6);
+    }
+    .dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 6;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: #ddd;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .dot.active {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">PetHome</div>
+    <nav>
+      <a href="#">Каталог</a>
+      <a href="#">О нас</a>
+      <a href="#">Контакты</a>
+      <a href="#">Профиль</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Найдите своего друга</h1>
+    <p>Попробуйте поиск по породе или городу — мы подберём лучших питомцев.</p>
+    <div class="search-box">
+      <input type="text" placeholder="Введите породу или город" />
+      <button class="btn">Найти</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Популярные питомцы</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131" alt="cat 1" />
+            <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a" alt="cat 2" />
+            <img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0" alt="cat 3" />
+          </div>
+          <button class="prev" aria-label="Previous">‹</button>
+          <button class="next" aria-label="Next">›</button>
+        </div>
+        <div class="card-content">
+          <div class="card-title">Луна</div>
+          <div class="card-info">4 месяца • Британская</div>
+          <button class="btn" style="width:100%">Подробнее</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131" alt="dog 1" />
+            <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a" alt="dog 2" />
+          </div>
+          <button class="prev" aria-label="Previous">‹</button>
+          <button class="next" aria-label="Next">›</button>
+        </div>
+        <div class="card-content">
+          <div class="card-title">Ричи</div>
+          <div class="card-info">1 год • Голден ретривер</div>
+          <button class="btn" style="width:100%">Подробнее</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="slider">
+          <div class="slides">
+            <img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0" alt="corgi 1" />
+            <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a" alt="corgi 2" />
+            <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131" alt="corgi 3" />
+            <img src="https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0" alt="corgi 4" />
+          </div>
+          <button class="prev" aria-label="Previous">‹</button>
+          <button class="next" aria-label="Next">›</button>
+        </div>
+        <div class="card-content">
+          <div class="card-title">Сима</div>
+          <div class="card-info">6 месяцев • Корги</div>
+          <button class="btn" style="width:100%">Подробнее</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 PetHome — Платформа для поиска питомцев
+  </footer>
+<script>
+  // Initialize sliders inside each card
+  document.querySelectorAll('.slider').forEach(slider => {
+    const slides = slider.querySelector('.slides');
+    const imgs = slider.querySelectorAll('img');
+    if (!slides || imgs.length === 0) return; // nothing to do
+
+    let index = 0;
+
+    // Create dots container and dots
+    const dotsContainer = document.createElement('div');
+    dotsContainer.className = 'dots';
+
+    imgs.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => {
+        index = i;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    slider.appendChild(dotsContainer);
+
+    function updateDots() {
+      const dots = dotsContainer.querySelectorAll('.dot');
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === index));
+    }
+
+    // Next / Prev buttons
+    const nextBtn = slider.querySelector('.next');
+    const prevBtn = slider.querySelector('.prev');
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        index = (index + 1) % imgs.length;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+      });
+    }
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        index = (index - 1 + imgs.length) % imgs.length;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+      });
+    }
+
+    // Optional: support swipe on touch devices
+    let startX = 0;
+    let isDragging = false;
+    slides.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    });
+    slides.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      // small drag feedback (optional)
+      slides.style.transition = 'none';
+      slides.style.transform = `translateX(-${index * 100}% + ${dx}px)`;
+    });
+    slides.addEventListener('touchend', e => {
+      isDragging = false;
+      slides.style.transition = '';
+      const endX = e.changedTouches[0].clientX;
+      const dx = endX - startX;
+      if (Math.abs(dx) > 50) {
+        if (dx < 0) {
+          index = Math.min(index + 1, imgs.length - 1);
+        } else {
+          index = Math.max(index - 1, 0);
+        }
+      }
+      slides.style.transform = `translateX(-${index * 100}%)`;
+      updateDots();
+    });
+
+  });
+</script>
+</body>
+</html>
