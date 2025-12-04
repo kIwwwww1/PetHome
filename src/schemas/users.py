@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, EmailStr
 
 Roles = Literal['salesman','buyer', 'admin']
 
-class User(BaseModel):
+class NewUser(BaseModel):
     name: str = Field(min_length=3, max_length=15)
-    email: EmailStr
+    email: EmailStr | None
     role: Roles
