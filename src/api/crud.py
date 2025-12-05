@@ -37,6 +37,7 @@ async def create_user(new_user: NewUser, session: SessionDep):
     except Exception as e:
         return {'message': f'Ошибка: {e}'}
     
+
 @user_router.get('/create-database')
 async def create_database():
     try:
@@ -44,5 +45,6 @@ async def create_database():
             await conn.run_sync(Base.metadata.create_all)
             return {'True': 'База создана'}
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=404, detail=f'{e}')
 
