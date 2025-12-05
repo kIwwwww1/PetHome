@@ -5,5 +5,5 @@ Roles = Literal['salesman','buyer', 'admin']
 
 class NewUser(BaseModel):
     name: str = Field(min_length=3, max_length=15)
-    email: EmailStr | None
+    email: EmailStr
     role: Roles

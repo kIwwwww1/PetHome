@@ -12,7 +12,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(default=f'User{id}')
     email: Mapped[str]
-    role: Mapped[str] = mapped_column(default=False)
+    role: Mapped[str] = mapped_column(nullable=False)
     verified: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     pets: Mapped[List['Pet']] = relationship('Pet', 
