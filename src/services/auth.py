@@ -1,0 +1,54 @@
+from fastapi import Response, Request, HTTPException, status
+from os import getenv
+from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordBearer
+from passlib.context import CryptContext
+from passlib.hash import bcrypt
+from jose import jwt, JWTError
+# 
+
+load_dotenv()
+
+SECRET_KEY = str(getenv('SECRET_KEY'))
+SECRET_ALGORITHM = str(getenv('ALGORITHM'))
+COOKIES_SESSION_ID_KEY = str(getenv('COOKIES_SESSION_ID_KEY'))
+THIRTY_DAYS = 30 * 24 * 60 * 60 
+
+
+bcrypt_context = CryptContext(schemes=['argon2'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+
+
+async def create_access_token(name: str, email: str, role: str, verified: bool):
+    '''Создание нового токена без добавления в куки'''
+
+    encode = {'name': name, 'email': email, 'role': role, 'verified': verified}
+    return jwt.encode(encode, SECRET_KEY, algorithm=SECRET_ALGORITHM)
+
+async def add_token(name: str, email: str, role: str, verified: bool, response: Response):
+    '''Создание токена и добавление в куки созданый токен'''
+
+    token = await create_access_token(name, email, role, verified)
+    response.set_cookie(key=COOKIES_SESSION_ID_KEY, value=token, max_age=THIRTY_DAYS, httponly=True, samesite='lax')
+    return token
+
+
+
+async def get_token_from_cookie(request: Request):
+    '''Поиск токена в куках пользователя'''
+
+    token = request.cookies.get(COOKIES_SESSION_ID_KEY)
+    try:
+        if not token:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='not found token')
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[SECRET_ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    return payload
+
+
+async def hashed_password(password: str):
+    '''Хеширование пароля пользователя'''
+
+    user_hashed_password = bcrypt_context.hash(password)
+    return user_hashed_password
