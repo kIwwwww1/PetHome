@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response
 from .dependencies import SessionDep
 # 
 from src.schemas.users_schemas import NewUser, UserData
-from src.services.user_service import add_user_in_db, delete_user_by_db
+from src.services.user_service import add_user_in_db, delete_user_by_db, verification_user_data
 from src.services.auth import delete_token_from_cookie
 # 
 from src.models.models import User
@@ -23,8 +23,8 @@ async def create_user(new_user: NewUser, session: SessionDep, response: Response
 
 @user_router.post('/login-account')
 async def login_account(user_data: UserData, session: SessionDep):
-    pass
-
+    resp = await verification_user_data(user_data.email, user_data.password, session)
+    return {'message': resp}
 
 
 @user_router.get('/logout-account')

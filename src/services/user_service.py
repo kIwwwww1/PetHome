@@ -15,6 +15,18 @@ async def get_email_in_db(email: str, session: AsyncSession):
     user = (await session.execute(select(User).filter_by(email=email))).scalar_one_or_none()
     return user
 
+async def verification_user_data(user_email: str, user_password: str, session: AsyncSession):
+    try:
+        if (user := await get_email_in_db(user_email, session)) and (await password_verification(user.password, user_password)):
+            logging.info('Пока все гуд!')
+            return 'Вы вошли в аккаунт'
+        raise IsNotCorrectData
+    except IsNotCorrectData:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail='Данные не верны')
+    except Exception as e:
+        logging.warning(e)
+
 
 async def add_user_in_db(user_for_add: NewUser, session: AsyncSession, response: Response):
     '''Добавляет пользователя (и добавление токе в куки) в бд если такой почты нет в бд'''

@@ -60,5 +60,8 @@ async def hashed_password(password: str) -> str:
     user_hashed_password = bcrypt_context.hash(password)
     return user_hashed_password
 
+
 async def password_verification(db_password: str, user_password: str) -> bool:
+    '''Сверка херированых паролей'''
+    
     return bcrypt_context.verify(user_password, db_password)
