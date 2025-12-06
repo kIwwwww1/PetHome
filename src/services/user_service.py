@@ -35,7 +35,7 @@ async def add_user_in_db(user_for_add: NewUser, session: AsyncSession, response:
                         role=user_for_add.role, 
                         verified=False, response=response)
         await session.commit()
-        return {'True': 'Пользователь добавлен'}
+        return 'Пользователь добавлен'
     
     except Exception as e:
         await session.rollback()
@@ -52,14 +52,14 @@ async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
                 if (await password_verification(db_password=user.password, user_password=user_for_delete.password)):
                     await session.delete(user)
                     await session.commit()
-                    return {'Пользователь удален'}
-                raise IsNotCorrectData
+                    return 'Аккаунт пользователя удален'
         raise IsNotCorrectData
     except IsNotCorrectData:
-        return {'Данные не верны'}
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
+                            detail='Данные не верны')
     
     except Exception as e:
         await session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                            detail='Ошибка в бд')
+                            detail='Ошибка в работе базы данных')
 

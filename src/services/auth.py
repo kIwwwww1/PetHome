@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 from passlib.hash import bcrypt
 from jose import jwt, JWTError
 # 
+from src.exception import IsNotCorrectData
 
 load_dotenv()
 
@@ -35,7 +36,6 @@ async def add_token(name: str, email: str, role: str, verified: bool, response: 
     return token
 
 
-
 async def get_token_from_cookie(request: Request):
     '''Поиск токена в куках пользователя'''
 
@@ -47,6 +47,11 @@ async def get_token_from_cookie(request: Request):
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     return payload
+
+async def delete_token_from_cookie(response: Response):
+    '''Удаление токена из кук если мы уверены что пользователь в аккаунте'''
+
+    response.delete_cookie(COOKIES_SESSION_ID_KEY)
 
 
 async def hashed_password(password: str) -> str:
