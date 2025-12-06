@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Annotated
 from sqlalchemy import func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from datetime import datetime
+
 
 class Base(DeclarativeBase):
     pass
@@ -15,7 +16,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     role: Mapped[str] = mapped_column(nullable=False)
     verified: Mapped[bool] = mapped_column(default=False)
-    created_at: Mapped[datetime] = mapped_column(default=func.now())
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     pets: Mapped[List['Pet']] = relationship('Pet', 
                                              back_populates='owner',
                                              cascade='all, delete-orphan',
@@ -30,7 +31,7 @@ class Pet(Base):
     breed: Mapped[str] = mapped_column(default='Беспородный')
     description: Mapped[str] = mapped_column(default='Описание отсутствует')
     location: Mapped[str] = mapped_column(default='Локация не указана')
-    created_at: Mapped[datetime] = mapped_column(default=func.now())
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
     owner: Mapped['User'] = relationship('User', back_populates='pets')
