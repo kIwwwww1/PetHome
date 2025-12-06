@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response
 from .dependencies import SessionDep
 # 
 from src.schemas.users_schemas import NewUser, UserData
-from src.services.user_service import add_user_in_db
+from src.services.user_service import add_user_in_db, delete_user_by_db
 # 
 from src.models.models import Base
 from src.db.database import engine
@@ -23,7 +23,9 @@ async def create_user(new_user: NewUser, session: SessionDep, response: Response
 @user_router.delete('/delete-user-account')
 async def delete_user_account(delete_user: UserData, session: SessionDep):
     '''Удаление всех данных о пользователе из бд''' 
-    pass
+    resp = await delete_user_by_db(delete_user, session)
+    return {'message': resp}
+
 
 
 

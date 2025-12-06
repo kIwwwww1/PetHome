@@ -1,10 +1,13 @@
+import logging
 from fastapi import HTTPException, status, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 # 
+from src.services.auth import hashed_password
 from src.models.models import User
-from src.schemas.users_schemas import NewUser
-from src.services.auth import hashed_password, add_token
+from src.schemas.users_schemas import NewUser, UserData
+from src.services.auth import hashed_password, add_token, password_verification
+from src.exception import IsNotCorrectData
 
 async def get_email_in_db(email: str, session: AsyncSession):
     '''Ищет пользователя в бд по email'''
@@ -39,5 +42,24 @@ async def add_user_in_db(user_for_add: NewUser, session: AsyncSession, response:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                     detail='Пользователь не добавлен')
 
-        
-        
+
+async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
+    '''Удаление пользователя из базы'''
+
+    try:
+        user = await get_email_in_db(user_for_delete.email, session)
+        if user:
+                if (await password_verification(db_password=user.password, user_password=user_for_delete.password)):
+                    await session.delete(user)
+                    await session.commit()
+                    return {'Пользователь удален'}
+                raise IsNotCorrectData
+        raise IsNotCorrectData
+    except IsNotCorrectData:
+        return {'Данные не верны'}
+    
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                            detail='Ошибка в бд')
+

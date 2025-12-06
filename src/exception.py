@@ -9,3 +9,6 @@ def logging_config(level: int):
 
 class UserExistsException(Exception):
     pass
+
+class IsNotCorrectData(Exception):
+    pass

@@ -1,3 +1,5 @@
+import logging
+import secrets
 from fastapi import Response, Request, HTTPException, status
 from os import getenv
 from dotenv import load_dotenv
@@ -47,8 +49,11 @@ async def get_token_from_cookie(request: Request):
     return payload
 
 
-async def hashed_password(password: str):
+async def hashed_password(password: str) -> str:
     '''Хеширование пароля пользователя'''
 
     user_hashed_password = bcrypt_context.hash(password)
     return user_hashed_password
+
+async def password_verification(db_password: str, user_password: str) -> bool:
+    return bcrypt_context.verify(user_password, db_password)
