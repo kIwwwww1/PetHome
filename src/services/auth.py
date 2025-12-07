@@ -17,7 +17,6 @@ SECRET_ALGORITHM = str(getenv('ALGORITHM'))
 COOKIES_SESSION_ID_KEY = str(getenv('COOKIES_SESSION_ID_KEY'))
 THIRTY_DAYS = 30 * 24 * 60 * 60 
 
-
 bcrypt_context = CryptContext(schemes=['argon2'], deprecated='auto')
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 
@@ -27,6 +26,7 @@ async def create_access_token(name: str, email: str, role: str, verified: bool):
 
     encode = {'name': name, 'email': email, 'role': role, 'verified': verified}
     return jwt.encode(encode, SECRET_KEY, algorithm=SECRET_ALGORITHM)
+
 
 async def add_token(name: str, email: str, role: str, verified: bool, response: Response):
     '''Создание токена и добавление в куки созданый токен'''
@@ -48,10 +48,12 @@ async def get_token_from_cookie(request: Request):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     return payload
 
+
 async def delete_token_from_cookie(response: Response):
     '''Удаление токена из кук если мы уверены что пользователь в аккаунте'''
 
     response.delete_cookie(COOKIES_SESSION_ID_KEY)
+    return 'Пользователь вышел из аккаунта'
 
 
 async def hashed_password(password: str) -> str:
@@ -62,6 +64,6 @@ async def hashed_password(password: str) -> str:
 
 
 async def password_verification(db_password: str, user_password: str) -> bool:
-    '''Сверка херированых паролей'''
-    
+    '''Сверка херированых паролей (из пароля и бд)'''
+
     return bcrypt_context.verify(user_password, db_password)

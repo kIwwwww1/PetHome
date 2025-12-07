@@ -1,13 +1,13 @@
 import logging
-from fastapi import HTTPException, status, Response
+from fastapi import HTTPException, status, Response, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 # 
-from src.services.auth import hashed_password
+from src.services.auth import hashed_password, get_token_from_cookie
 from src.models.models import User
-from src.schemas.users_schemas import NewUser, UserData
+from src.schemas.users_schemas import NewUser, UserData, ContactPhone
 from src.services.auth import hashed_password, add_token, password_verification
-from src.exception import IsNotCorrectData
+from src.exception import IsNotCorrectData, PhoneExists
 
 async def get_email_in_db(email: str, session: AsyncSession):
     '''Ищет пользователя в бд по email'''
@@ -15,10 +15,11 @@ async def get_email_in_db(email: str, session: AsyncSession):
     user = (await session.execute(select(User).filter_by(email=email))).scalar_one_or_none()
     return user
 
-async def verification_user_data(user_email: str, user_password: str, session: AsyncSession):
+async def verification_user_data(user_email: str, user_password: str, response: Response, session: AsyncSession):
     try:
         if (user := await get_email_in_db(user_email, session)) and (await password_verification(user.password, user_password)):
-            logging.info('Пока все гуд!')
+            '''Создать токен и добавить в куку'''
+            await add_token(user.name, user.email, user.role, user.verified, response)
             return 'Вы вошли в аккаунт'
         raise IsNotCorrectData
     except IsNotCorrectData:
@@ -74,4 +75,25 @@ async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
         await session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                             detail='Ошибка в работе базы данных')
+    
+
+async def add_phone_number_in_db(user_phone: str, request: Request, session: AsyncSession):
+    '''Добавление номера телефона в бд'''
+
+    
+    '''Добавить что бы статус аккаунта менялся на подтвержден если телефон успешно добавлен'''
+    try:
+        token_data = (await get_token_from_cookie(request))
+        user = (await session.execute(select(User).filter_by(email=token_data.get('email')))).scalar_one()
+        if user.phone_number is None:
+            user.phone_number = user_phone
+            await session.commit()
+            return 'Телефон добавлен'
+        raise PhoneExists        
+    except PhoneExists:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не можете сменить номер телефона')
+
+
+async def add_telegram_in_db(telegram: str, request: Request, session: AsyncSession):
+    '''Добавление телеграм в бд'''
 

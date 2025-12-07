@@ -12,3 +12,6 @@ class UserExistsException(Exception):
 
 class IsNotCorrectData(Exception):
     pass
+
+class PhoneExists(Exception):
+    pass
