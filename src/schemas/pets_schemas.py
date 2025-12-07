@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
 
-class Pet(BaseModel):
-    name: str | None = Field(min_length=2, max_length=10)
+class Pets(BaseModel):
+    name: str | None = Field(min_length=2, max_length=15, default='Без имени')
     age: int = Field(ge=0)
-    breed: str = Field(min_length=3, max_length=30)
-    description: str | None = Field(min_length=10, max_length=250)
-    location: str | None = Field(min_length=5, max_length=30)
+    breed: str = Field(min_length=3, max_length=30, default='Беспородный')
+    description: str | None = Field(max_length=250, default='Описание отсутствует')
+    location: str | None = Field(min_length=10, max_length=30, default='Локация не указана')
 
 # dogs = {
 #   "1": "Австралийская борзая",

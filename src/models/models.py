@@ -28,11 +28,11 @@ class Pet(Base):
     __tablename__ = 'pets'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(default='Без имени')
+    name: Mapped[str]
     age: Mapped[int] = mapped_column(nullable=False)
-    breed: Mapped[str] = mapped_column(default='Беспородный', index=True)
-    description: Mapped[str] = mapped_column(default='Описание отсутствует')
-    location: Mapped[str] = mapped_column(default='Локация не указана')
+    breed: Mapped[str] = mapped_column(index=True)
+    description: Mapped[str]
+    location: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
 
@@ -47,7 +47,7 @@ class PetPhoto(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     pet_id: Mapped[int] = mapped_column(ForeignKey('pets.id'), nullable=False)
-    url: Mapped[str]
+    url: Mapped[str | None] = mapped_column(default='https://n1s1.hsmedia.ru/be/90/34/be9034d762857e5ba510937ce31b14b9/728x728_1_666010ab55120072825c74de5a7e19b0@1000x1000_0x10fmyjvQ_7882540427738188474.jpg.webp')
     order_index: Mapped[int]
 
     pet: Mapped['Pet'] = relationship('Pet', back_populates='photos')
