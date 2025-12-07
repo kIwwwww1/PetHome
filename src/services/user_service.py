@@ -9,16 +9,19 @@ from src.schemas.users_schemas import NewUser, UserData, ContactPhone
 from src.services.auth import hashed_password, add_token, password_verification, update_verified_in_cookie
 from src.exception import IsNotCorrectData, PhoneExists, TelegramExists
 
+
 async def get_email_in_db(email: str, session: AsyncSession):
     '''Ищет пользователя в бд по email'''
 
     user = (await session.execute(select(User).filter_by(email=email))).scalar_one_or_none()
     return user
 
+
 async def verification_user_data(user_email: str, user_password: str, response: Response, session: AsyncSession):
+    '''Если данные в базе и которые ввел пользователь то создаем ему токен и он входит в аккаунт'''
+
     try:
         if (user := await get_email_in_db(user_email, session)) and (await password_verification(user.password, user_password)):
-            '''Создать токен и добавить в куку'''
             await add_token(user.name, user.email, user.role, user.verified, response)
             return 'Вы вошли в аккаунт'
         raise IsNotCorrectData
@@ -95,6 +98,7 @@ async def add_phone_number_in_db(user_phone: str, request: Request, response: Re
             return 'Телефон добавлен'
         raise PhoneExists
     except PhoneExists:
+        await session.rollback()
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не можете сменить номер телефона')
 
 
@@ -102,12 +106,13 @@ async def add_telegram_in_db(telegram: str, request: Request, session: AsyncSess
     '''Добавление телеграма в бд или замена уже существующего'''
 
     try:
-        if (user := await get_user_by_token(request, session)):
+        if (user := await get_user_by_token(request, session)) and telegram != user.telegram:
             user.telegram = telegram
             await session.commit()
-            return {'Телеграм добавлен'}
+            return 'Телеграм добавлен'
         raise TelegramExists
     except TelegramExists:
+        await session.rollback()
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не смогли сменить телеграм')
 
 
