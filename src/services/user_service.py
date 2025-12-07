@@ -7,7 +7,7 @@ from src.services.auth import hashed_password, get_token_from_cookie
 from src.models.models import User
 from src.schemas.users_schemas import NewUser, UserData, ContactPhone
 from src.services.auth import hashed_password, add_token, password_verification, update_verified_in_cookie
-from src.exception import IsNotCorrectData, PhoneExists
+from src.exception import IsNotCorrectData, PhoneExists, TelegramExists
 
 async def get_email_in_db(email: str, session: AsyncSession):
     '''Ищет пользователя в бд по email'''
@@ -77,26 +77,38 @@ async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
                             detail='Ошибка в работе базы данных')
     
 
+async def get_user_by_token(request: Request, session: AsyncSession):
+    token_data = await get_token_from_cookie(request)
+    user = (await session.execute(select(User).filter_by(email=token_data.get('email')))).scalar_one()
+    return user
+
+
 async def add_phone_number_in_db(user_phone: str, request: Request, response: Response, session: AsyncSession):
-    '''Добавление номера телефона в бд'''
+    '''Добавление номера телефона в бд и смена статуса аккаунта'''
 
-
-    '''Добавить что бы статус аккаунта менялся на подтвержден если телефон успешно добавлен'''
-    '''Разделить все это по разным функциям'''
     try:
-        token_data = await get_token_from_cookie(request)
-        user = (await session.execute(select(User).filter_by(email=token_data.get('email')))).scalar_one()
-        if user.phone_number is None:
+        if (user := await get_user_by_token(request, session)) and user.phone_number is None:
             user.phone_number = user_phone
             user.verified = True
-            await update_verified_in_cookie(token_data, response=response)
+            await update_verified_in_cookie(request, response)
             await session.commit()
             return 'Телефон добавлен'
-        raise PhoneExists        
+        raise PhoneExists
     except PhoneExists:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не можете сменить номер телефона')
 
 
 async def add_telegram_in_db(telegram: str, request: Request, session: AsyncSession):
-    '''Добавление телеграм в бд'''
+    '''Добавление телеграма в бд или замена уже существующего'''
+
+    try:
+        if (user := await get_user_by_token(request, session)):
+            user.telegram = telegram
+            await session.commit()
+            return {'Телеграм добавлен'}
+        raise TelegramExists
+    except TelegramExists:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не смогли сменить телеграм')
+
+
 

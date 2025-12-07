@@ -15,3 +15,6 @@ class IsNotCorrectData(Exception):
 
 class PhoneExists(Exception):
     pass
+
+class TelegramExists(Exception):
+    pass

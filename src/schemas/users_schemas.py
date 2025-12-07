@@ -27,7 +27,7 @@ class ContactPhone(BaseModel):
         return phone
 
 
-class ContactTelegram(ContactPhone):
+class ContactTelegram(BaseModel):
     telegram: str
     
     @field_validator("telegram")
