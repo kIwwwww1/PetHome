@@ -22,7 +22,7 @@ async def verification_user_data(user_email: str, user_password: str, response: 
 
     try:
         if (user := await get_email_in_db(user_email, session)) and (await password_verification(user.password, user_password)):
-            await add_token(user.name, user.email, user.role, user.verified, response)
+            await add_token(user.id, user.name, user.email, user.role, user.verified, response)
             return 'Вы вошли в аккаунт'
         raise IsNotCorrectData
     except IsNotCorrectData:
@@ -46,7 +46,10 @@ async def add_user_in_db(user_for_add: NewUser, session: AsyncSession, response:
             role=user_for_add.role)
     try:
         session.add(new_user)
-        await add_token(user_for_add.name, 
+        await session.flush()
+        _user = (await session.execute(select(User).filter_by(email=user_for_add.email))).scalar_one()
+        await add_token(id=_user.id,
+                        name=user_for_add.name, 
                         email=user_for_add.email, 
                         role=user_for_add.role, 
                         verified=False, response=response)
