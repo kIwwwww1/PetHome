@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.services.auth import hashed_password, get_token_from_cookie
 from src.models.models import User
 from src.schemas.users_schemas import NewUser, UserData, ContactPhone
-from src.services.auth import hashed_password, add_token, password_verification, update_verified_in_cookie
+from src.services.auth import (hashed_password, add_token, 
+                               password_verification, update_verified_in_cookie,
+                               delete_token_from_cookie)
 from src.exception import IsNotCorrectData, PhoneExists, TelegramExists
 
 
@@ -62,7 +64,7 @@ async def add_user_in_db(user_for_add: NewUser, session: AsyncSession, response:
                     detail='Пользователь не добавлен')
 
 
-async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
+async def delete_user_by_db(user_for_delete: UserData, response: Response, session: AsyncSession):
     '''Удаление пользователя из базы'''
 
     try:
@@ -71,6 +73,7 @@ async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
                 if (await password_verification(db_password=user.password, user_password=user_for_delete.password)):
                     await session.delete(user)
                     await session.commit()
+                    await delete_token_from_cookie(response)
                     return 'Аккаунт пользователя удален'
         raise IsNotCorrectData
     except IsNotCorrectData:

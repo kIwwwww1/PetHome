@@ -42,10 +42,10 @@ async def logout_user(response: Response, auth: AuthorizationCheckDep, session: 
 
 @user_router.delete('/delete-user-account')
 async def delete_user_account(delete_user: UserData, auth: AuthorizationCheckDep, 
-                              session: SessionDep):
+                              response: Response, session: SessionDep):
     '''Удаление всех данных о пользователе из бд''' 
     
-    resp = await delete_user_by_db(delete_user, session)
+    resp = await delete_user_by_db(delete_user, response, session)
     return {'message': resp}
 
 
