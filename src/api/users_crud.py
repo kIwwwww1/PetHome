@@ -44,9 +44,9 @@ async def delete_user_account(delete_user: UserData, session: SessionDep):
 
 
 @user_router.post('/add-contacts/phone-number')
-async def add_user_phone_number(user_phone: ContactPhone, request: Request, session: SessionDep):
-    resp = await add_phone_number_in_db(user_phone.phone, request, session)
-    return {'Message': resp}
+async def add_user_phone_number(user_phone: ContactPhone, request: Request, response: Response, session: SessionDep):
+    resp = await add_phone_number_in_db(user_phone.phone, request, response, session)
+    return {'message': resp}
 
 
 @user_router.post('/add-contacts/telegram')

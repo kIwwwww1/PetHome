@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.services.auth import hashed_password, get_token_from_cookie
 from src.models.models import User
 from src.schemas.users_schemas import NewUser, UserData, ContactPhone
-from src.services.auth import hashed_password, add_token, password_verification
+from src.services.auth import hashed_password, add_token, password_verification, update_verified_in_cookie
 from src.exception import IsNotCorrectData, PhoneExists
 
 async def get_email_in_db(email: str, session: AsyncSession):
@@ -77,16 +77,19 @@ async def delete_user_by_db(user_for_delete: UserData, session: AsyncSession):
                             detail='Ошибка в работе базы данных')
     
 
-async def add_phone_number_in_db(user_phone: str, request: Request, session: AsyncSession):
+async def add_phone_number_in_db(user_phone: str, request: Request, response: Response, session: AsyncSession):
     '''Добавление номера телефона в бд'''
 
-    
+
     '''Добавить что бы статус аккаунта менялся на подтвержден если телефон успешно добавлен'''
+    '''Разделить все это по разным функциям'''
     try:
-        token_data = (await get_token_from_cookie(request))
+        token_data = await get_token_from_cookie(request)
         user = (await session.execute(select(User).filter_by(email=token_data.get('email')))).scalar_one()
         if user.phone_number is None:
             user.phone_number = user_phone
+            user.verified = True
+            await update_verified_in_cookie(token_data, response=response)
             await session.commit()
             return 'Телефон добавлен'
         raise PhoneExists        

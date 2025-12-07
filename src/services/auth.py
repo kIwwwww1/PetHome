@@ -55,6 +55,11 @@ async def delete_token_from_cookie(response: Response):
     response.delete_cookie(COOKIES_SESSION_ID_KEY)
     return 'Пользователь вышел из аккаунта'
 
+async def update_verified_in_cookie(cookie_token: dict, response: Response):
+    cookie_token['verified'] = True
+    await add_token(**cookie_token, response=response)
+    return 'Вы подтвердили аккаунт'
+
 
 async def hashed_password(password: str) -> str:
     '''Хеширование пароля пользователя'''
