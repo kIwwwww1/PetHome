@@ -42,7 +42,7 @@ async def get_token_from_cookie(request: Request):
     token = request.cookies.get(COOKIES_SESSION_ID_KEY)
     try:
         if not token:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='not found token')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Вы не вошли в аккаунт')
         payload = jwt.decode(token, SECRET_KEY, algorithms=[SECRET_ALGORITHM])
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
@@ -57,7 +57,7 @@ async def delete_token_from_cookie(response: Response):
 
 async def update_verified_in_cookie(request: Request, response: Response):
     '''Пересоздание куки с новым статусом аккаунта'''
-    
+
     cookie_token = await get_token_from_cookie(request)
     cookie_token['verified'] = True
     await add_token(**cookie_token, response=response)

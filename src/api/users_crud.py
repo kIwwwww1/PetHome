@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import select
 from fastapi import APIRouter, Response, Request
-from .dependencies import SessionDep
+from .dependencies import SessionDep, AuthorizationCheckDep
 # 
 from src.schemas.users_schemas import NewUser, UserData, ContactPhone, ContactTelegram
 from src.services.user_service import (add_user_in_db, delete_user_by_db, 
@@ -33,7 +33,7 @@ async def login_account(user_data: UserData, response: Response, session: Sessio
 
 
 @user_router.get('/logout-account')
-async def logout_user(response: Response, session: SessionDep):
+async def logout_user(response: Response, auth: AuthorizationCheckDep, session: SessionDep):
     '''Выход из аккаунта'''
 
     resp = await delete_token_from_cookie(response)
@@ -41,7 +41,8 @@ async def logout_user(response: Response, session: SessionDep):
 
 
 @user_router.delete('/delete-user-account')
-async def delete_user_account(delete_user: UserData, session: SessionDep):
+async def delete_user_account(delete_user: UserData, auth: AuthorizationCheckDep, 
+                              session: SessionDep):
     '''Удаление всех данных о пользователе из бд''' 
     
     resp = await delete_user_by_db(delete_user, session)
@@ -49,16 +50,17 @@ async def delete_user_account(delete_user: UserData, session: SessionDep):
 
 
 @user_router.post('/add-contacts/phone-number')
-async def add_user_phone_number(user_phone: ContactPhone, request: Request, 
-                                response: Response, session: SessionDep):
+async def add_user_phone_number(user_phone: ContactPhone, auth: AuthorizationCheckDep, 
+                                request: Request, response: Response, session: SessionDep):
     '''Добавление номера телефона'''
-    
+
     resp = await add_phone_number_in_db(user_phone.phone, request, response, session)
     return {'message': resp}
 
 
 @user_router.post('/add-contacts/telegram')
-async def add_user_telegram(user_telegram: ContactTelegram, request: Request, session: SessionDep):
+async def add_user_telegram(user_telegram: ContactTelegram, auth: AuthorizationCheckDep, 
+                            request: Request, session: SessionDep):
     '''Добавление телеграма'''
 
     resp = await add_telegram_in_db(user_telegram.telegram, request, session)
