@@ -4,6 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 # 
 from src.models.models import Pet, PetPhoto
+from src.schemas.pets_schemas import (Pets, ChangeName, ChangeBreed, ChangeDescription,
+                                      ChangePrice, ChangeLocation)
+
 from src.schemas.pets_schemas import Pets
 from src.services.auth import get_token_from_cookie
 from src.exception import PetNotFound
@@ -43,20 +46,72 @@ async def user_id_and_owner_id(pet_id: int, request: Request, session: AsyncSess
     '''Проверяем у животного кто его владелец если совпадает пользователь и id владельца у животного 
     то возращаем животное'''
 
-    pet_for_delete = await get_pet_by_id(pet_id, session)
+    pet = await get_pet_by_id(pet_id, session)
     _user_id = (await get_token_from_cookie(request))['id']
-    if pet_for_delete.owner_id == _user_id:
-        return pet_for_delete
+    if pet.owner_id == _user_id:
+        return pet
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                          detail='Вы не владелец')
 
 
 async def delete_user_pet_in_db(pet_id: int, request: Request, session: AsyncSession):
     '''Убадение животного из базы и проверка на удаление'''
-    
+
     pet_for_delete = await user_id_and_owner_id(pet_id, request, session)
     await session.delete(pet_for_delete)
     await session.commit()
     return 'Питомец удален'
 
+async def update_name_pet_id_db(pet_id: int, new_name: str, 
+                                request: Request, session: AsyncSession):
+    pet_for_update = await user_id_and_owner_id(pet_id, request, session)
+    if pet_for_update.name != new_name:
+        pet_for_update.name = new_name
+        await session.commit()
+        return 'Вы сменили имя'
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail='Не удалось сменить имя')
+
+async def update_breed_pet_id_db(pet_id: int, new_breed: str, 
+                                request: Request, session: AsyncSession):
+    pet_for_update = await user_id_and_owner_id(pet_id, request, session)
+    if pet_for_update.breed != new_breed:
+        pet_for_update.breed = new_breed
+        await session.commit()
+        return 'Вы сменили породу'
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail='Не удалось сменить породу')
+
+
+async def update_description_pet_id_db(pet_id: int, new_description: str, 
+                                request: Request, session: AsyncSession):
+    pet_for_update = await user_id_and_owner_id(pet_id, request, session)
+    if pet_for_update.description != new_description:
+        pet_for_update.description = new_description
+        await session.commit()
+        return 'Вы сменили описание'
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail='Не удалось сменить описание')
+
+async def update_price_pet_id_db(pet_id: int, new_price: int, 
+                                request: Request, session: AsyncSession):
+    pet_for_update = await user_id_and_owner_id(pet_id, request, session)
+    if pet_for_update.price != new_price:
+        pet_for_update.price = new_price
+        await session.commit()
+        return 'Вы сменили цену'
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail='Не удалось сменить цену')
+
+
+
+async def update_location_pet_id_db(pet_id: int, new_location: str, 
+                                request: Request, session: AsyncSession):
+    pet_for_update = await user_id_and_owner_id(pet_id, request, session)
+    if pet_for_update.location != new_location:
+        pet_for_update.location = new_location
+        await session.commit()
+        return 'Вы сменили локацию'
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail='Не удалось сменить локацию')
 

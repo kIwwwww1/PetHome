@@ -1,12 +1,26 @@
 from pydantic import BaseModel, Field
 
-class Pets(BaseModel):
+class ChangeName(BaseModel):
     name: str | None = Field(min_length=2, max_length=15, default='Без имени')
-    age: int = Field(ge=0)
+
+class ChangeBreed(BaseModel):
     breed: str = Field(min_length=3, max_length=30, default='Беспородный')
-    price: int | None = Field(ge=0, le= 500_000, default=0)
+
+class ChangeDescription(BaseModel):
     description: str | None = Field(max_length=250, default='Описание отсутствует')
+
+class ChangePrice(BaseModel):
+    price: int | None = Field(ge=0, le= 500_000, default=0)
+
+class ChangeLocation(BaseModel):
     location: str | None = Field(min_length=10, max_length=30, default='Локация не указана')
+
+class Pets(ChangeName, 
+           ChangeBreed, 
+           ChangeDescription, 
+           ChangePrice, 
+           ChangeLocation):
+    age: int = Field(ge=0)
 
 # dogs = {
 #   "1": "Австралийская борзая",
