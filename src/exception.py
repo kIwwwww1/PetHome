@@ -18,3 +18,6 @@ class PhoneExists(Exception):
 
 class TelegramExists(Exception):
     pass
+
+class PetNotFound(Exception):
+    pass

@@ -55,6 +55,7 @@ async def delete_token_from_cookie(response: Response):
     response.delete_cookie(COOKIES_SESSION_ID_KEY)
     return 'Пользователь вышел из аккаунта'
 
+
 async def update_verified_in_cookie(request: Request, response: Response):
     '''Пересоздание куки с новым статусом аккаунта'''
 

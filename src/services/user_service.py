@@ -127,5 +127,5 @@ async def get_user_pets_in_db(request: Request, session: AsyncSession):
     user_id = (await get_token_from_cookie(request))['id']
     req = select(User).filter_by(id=user_id).options(selectinload(User.pets))
     user = (await session.execute(req)).scalar_one()
-    return user.pets
+    return user.pets if user.pets is not None else 'Тут пусто'
 
