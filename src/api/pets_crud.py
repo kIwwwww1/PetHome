@@ -2,11 +2,12 @@ from fastapi import APIRouter, Response, Request
 # 
 from src.api.dependencies import SessionDep, AuthorizationCheckDep
 from src.schemas.pets_schemas import (Pets, ChangeName, ChangeBreed, ChangeDescription,
-                                      ChangePrice, ChangeLocation)
+                                      ChangePrice, ChangeLocation, Species)
 from src.services.pet_service import (create_pet_for_sale, delete_user_pet_in_db,
                                       get_pet_by_id, update_name_pet_id_db, 
                                       update_breed_pet_id_db, update_description_pet_id_db,
-                                      update_price_pet_id_db, update_location_pet_id_db)
+                                      update_price_pet_id_db, update_location_pet_id_db,
+                                      random_number)
 
 
 dog_router = APIRouter(prefix='/dogs', tags=['Собаки'])
@@ -25,6 +26,14 @@ async def get_pet(pet_id: int, session: SessionDep):
     '''Перейти на страницу животного'''
 
     resp = await get_pet_by_id(pet_id, session)
+    return {'message': resp}
+
+
+# @dog_router.post('/random-pet/{pet_id}')
+@dog_router.post('/random-pet')
+async def get_random_pet_id(species: Species, session: SessionDep):
+    random_id = await random_number(species.species, session)
+    resp = await get_pet_by_id(random_id, session)
     return {'message': resp}
 
 
@@ -71,7 +80,7 @@ async def change_location_in_pet(pet_id: int, new_location: ChangeLocation,
     return {'message': resp}
 
 
-@dog_router.delete('/delete-pet/{pet_id}')
+@dog_router.delete('/{pet_id}/delete-pet')
 async def delete_user_pet(pet_id: int, auth: AuthorizationCheckDep, request: Request, 
                           session: SessionDep):
     '''Удаление животного с продажи и из бд'''

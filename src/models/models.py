@@ -28,6 +28,7 @@ class Pet(Base):
     __tablename__ = 'pets'
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    species: Mapped[str] = mapped_column(nullable=False)
     name: Mapped[str]
     age: Mapped[int] = mapped_column(nullable=False)
     breed: Mapped[str] = mapped_column(index=True)

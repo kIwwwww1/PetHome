@@ -1,6 +1,7 @@
 import logging
+from random import randint
 from fastapi import HTTPException, status, Response, Request
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 # 
 from src.models.models import Pet, PetPhoto
@@ -11,11 +12,25 @@ from src.schemas.pets_schemas import Pets
 from src.services.auth import get_token_from_cookie
 from src.exception import PetNotFound
 
+async def get_len_data_in_species(species, session: AsyncSession):
+    max_len = (await session.execute(
+                            select(func.count()).
+                            select_from(Pet).
+                            filter_by(species=species))).scalar_one()
+    return max_len
+
+async def random_number(species, session: AsyncSession):
+    _max = await get_len_data_in_species(species, session)
+    random_id = randint(1, _max)
+    return random_id
+
+
 
 async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession):
     '''создание и Добавление животного в бд'''
 
     session.add(Pet(
+        species=pet.species,
         name=pet.name,
         age=pet.age,
         breed=pet.breed,
@@ -93,6 +108,7 @@ async def update_description_pet_id_db(pet_id: int, new_description: str,
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail='Не удалось сменить описание')
 
+
 async def update_price_pet_id_db(pet_id: int, new_price: int, 
                                 request: Request, session: AsyncSession):
     pet_for_update = await user_id_and_owner_id(pet_id, request, session)
@@ -102,7 +118,6 @@ async def update_price_pet_id_db(pet_id: int, new_price: int,
         return 'Вы сменили цену'
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail='Не удалось сменить цену')
-
 
 
 async def update_location_pet_id_db(pet_id: int, new_location: str, 

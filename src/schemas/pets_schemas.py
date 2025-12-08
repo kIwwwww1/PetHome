@@ -1,4 +1,10 @@
+from typing import Literal
 from pydantic import BaseModel, Field
+
+Species_list = Literal['Dog', 'Cat']
+
+class Species(BaseModel):
+    species: Species_list
 
 class ChangeName(BaseModel):
     name: str | None = Field(min_length=2, max_length=15, default='Без имени')
@@ -15,7 +21,8 @@ class ChangePrice(BaseModel):
 class ChangeLocation(BaseModel):
     location: str | None = Field(min_length=10, max_length=30, default='Локация не указана')
 
-class Pets(ChangeName, 
+class Pets(Species,
+           ChangeName, 
            ChangeBreed, 
            ChangeDescription, 
            ChangePrice, 
