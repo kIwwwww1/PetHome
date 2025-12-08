@@ -31,6 +31,7 @@ class Pet(Base):
     name: Mapped[str]
     age: Mapped[int] = mapped_column(nullable=False)
     breed: Mapped[str] = mapped_column(index=True)
+    price: Mapped[int] = mapped_column(nullable=False)
     description: Mapped[str]
     location: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(default=func.now())

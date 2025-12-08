@@ -16,6 +16,7 @@ async def create_dog(dog_for_add: Pets, auth: AuthorizationCheckDep,
     resp = await create_pet_for_sale(dog_for_add, request, session)
     return {'message': resp}
 
+
 @dog_router.get('/pet/{pet_id}')
 async def get_pet(pet_id: int, session: SessionDep):
     '''Перейти на строницу животного'''

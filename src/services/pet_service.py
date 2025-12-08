@@ -15,6 +15,7 @@ async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession
         name=pet.name,
         age=pet.age,
         breed=pet.breed,
+        price=pet.price,
         description=pet.description,
         location=pet.location,
         owner_id=(await get_token_from_cookie(request))['id']
@@ -41,7 +42,7 @@ async def user_id_and_owner_id(pet_id: int, request: Request, session: AsyncSess
     if pet_for_delete.owner_id == _user_id:
         return pet_for_delete
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                         detail='Вам не владелей')
+                         detail='Вы не владелец')
 
 
 async def delete_user_pet_in_db(pet_id: int, request: Request, session: AsyncSession):

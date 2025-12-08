@@ -4,6 +4,7 @@ class Pets(BaseModel):
     name: str | None = Field(min_length=2, max_length=15, default='Без имени')
     age: int = Field(ge=0)
     breed: str = Field(min_length=3, max_length=30, default='Беспородный')
+    price: int | None = Field(ge=0, le= 500_000, default=0)
     description: str | None = Field(max_length=250, default='Описание отсутствует')
     location: str | None = Field(min_length=10, max_length=30, default='Локация не указана')
 
