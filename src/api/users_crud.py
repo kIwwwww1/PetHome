@@ -6,7 +6,7 @@ from .dependencies import SessionDep, AuthorizationCheckDep
 from src.schemas.users_schemas import NewUser, UserData, ContactPhone, ContactTelegram
 from src.services.user_service import (add_user_in_db, delete_user_by_db, 
                                        verification_user_data, add_phone_number_in_db,
-                                       add_telegram_in_db)
+                                       add_telegram_in_db, get_user_pets_in_db)
 from src.services.auth import delete_token_from_cookie
 # 
 from src.models.models import User
@@ -66,6 +66,12 @@ async def add_user_telegram(user_telegram: ContactTelegram, auth: AuthorizationC
     resp = await add_telegram_in_db(user_telegram.telegram, request, session)
     return {'message': resp}
 
+@user_router.get('/my_pets')
+async def get_user_pets(auth: AuthorizationCheckDep, request: Request, session: SessionDep):
+    '''Получение всех животных у пользователя'''
+    
+    resp = await get_user_pets_in_db(request, session)
+    return {'message': resp}
 
 
 

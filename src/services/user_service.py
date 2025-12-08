@@ -1,6 +1,7 @@
 import logging
 from fastapi import HTTPException, status, Response, Request
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 # 
 from src.services.auth import hashed_password, get_token_from_cookie
@@ -122,4 +123,9 @@ async def add_telegram_in_db(telegram: str, request: Request, session: AsyncSess
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не смогли сменить телеграм')
 
 
+async def get_user_pets_in_db(request: Request, session: AsyncSession):
+    user_id = (await get_token_from_cookie(request))['id']
+    req = select(User).filter_by(id=user_id).options(selectinload(User.pets))
+    user = (await session.execute(req)).scalar_one()
+    return user.pets
 

@@ -11,6 +11,7 @@ dog_router = APIRouter(prefix='/dogs', tags=['Собаки'])
 async def create_dog(dog_for_add: Pets, auth: AuthorizationCheckDep, 
                      request: Request, session: SessionDep):
     '''Добавление собаки на продажу'''
+    
     resp = await create_pet_for_sale(dog_for_add, request, session)
     return {'message': resp}
 

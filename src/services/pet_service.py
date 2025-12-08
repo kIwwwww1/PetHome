@@ -22,10 +22,3 @@ async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession
     await session.commit()
     return 'Пост успешно создан'
 
-
-# name
-# age
-# breed
-# description
-# location
-    
