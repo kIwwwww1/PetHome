@@ -23,6 +23,7 @@ async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession
     await session.commit()
     return 'Пост успешно создан'
 
+
 async def get_pet_by_id(id: int, session: AsyncSession):
     try:
         pet = (await session.execute(select(Pet).filter_by(id=id))).scalar_one_or_none()
@@ -34,12 +35,17 @@ async def get_pet_by_id(id: int, session: AsyncSession):
                             detail='Питомец не найден')
 
 
-async def user_id_and_owner_id(pet_id: int):
-    pass
-
-
-async def delete_user_pet_in_db(pet_id: int, session: AsyncSession):
+async def user_id_and_owner_id(pet_id: int, request: Request, session: AsyncSession):
     pet_for_delete = await get_pet_by_id(pet_id, session)
+    _user_id = (await get_token_from_cookie(request))['id']
+    if pet_for_delete.owner_id == _user_id:
+        return pet_for_delete
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                         detail='Вам не владелей')
+
+
+async def delete_user_pet_in_db(pet_id: int, request: Request, session: AsyncSession):
+    pet_for_delete = await user_id_and_owner_id(pet_id, request, session)
     await session.delete(pet_for_delete)
     await session.commit()
     return 'Питомец удален'

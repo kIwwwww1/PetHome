@@ -24,12 +24,12 @@ async def get_pet(pet_id: int, session: SessionDep):
     return {'message': resp}
 
 
-@dog_router.get('/delete-pet/{pet_id}')
+@dog_router.delete('/delete-pet/{pet_id}')
 async def delete_user_pet(pet_id: int, auth: AuthorizationCheckDep, request: Request, 
                           session: SessionDep):
     '''Удаление животного с продажи и из бд'''
 
-    resp = await delete_user_pet_in_db(pet_id, session)
+    resp = await delete_user_pet_in_db(pet_id, request, session)
     return {'message': resp}
 
 
