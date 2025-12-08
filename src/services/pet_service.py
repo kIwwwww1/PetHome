@@ -11,6 +11,7 @@ from src.exception import PetNotFound
 
 async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession):
     '''создание и Добавление животного в бд'''
+
     session.add(Pet(
         name=pet.name,
         age=pet.age,
@@ -26,6 +27,8 @@ async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession
 
 
 async def get_pet_by_id(id: int, session: AsyncSession):
+    '''Поиск животного в базе по id'''
+
     try:
         pet = (await session.execute(select(Pet).filter_by(id=id))).scalar_one_or_none()
         if pet:
@@ -37,6 +40,9 @@ async def get_pet_by_id(id: int, session: AsyncSession):
 
 
 async def user_id_and_owner_id(pet_id: int, request: Request, session: AsyncSession):
+    '''Проверяем у животного кто его владелец если совпадает пользователь и id владельца у животного 
+    то возращаем животное'''
+
     pet_for_delete = await get_pet_by_id(pet_id, session)
     _user_id = (await get_token_from_cookie(request))['id']
     if pet_for_delete.owner_id == _user_id:
@@ -46,6 +52,8 @@ async def user_id_and_owner_id(pet_id: int, request: Request, session: AsyncSess
 
 
 async def delete_user_pet_in_db(pet_id: int, request: Request, session: AsyncSession):
+    '''Убадение животного из базы и проверка на удаление'''
+    
     pet_for_delete = await user_id_and_owner_id(pet_id, request, session)
     await session.delete(pet_for_delete)
     await session.commit()
