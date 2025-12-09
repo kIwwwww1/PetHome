@@ -21,3 +21,6 @@ class TelegramExists(Exception):
 
 class PetNotFound(Exception):
     pass
+
+class UserIsNotAdmin(Exception):
+    pass
