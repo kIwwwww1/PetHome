@@ -28,6 +28,7 @@ async def check_user_for_admin(request: Request):
     except UserIsNotAdmin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Вы не админ')
 
+
 async def get_user_by_id(user_id: int, session: AsyncSession):
     '''Найти пользователя по id'''
 
@@ -41,7 +42,6 @@ async def get_user_by_id(user_id: int, session: AsyncSession):
                             detail='Не нашли пользователя')
 
 
-
 async def create_admin(id: int, session: AsyncSession):
     '''Сделать пользователя админом'''
 
@@ -50,9 +50,23 @@ async def create_admin(id: int, session: AsyncSession):
     await session.commit()
     return 'Вы сделали пользователя админом'
 
+
+async def delete_user_accunt_by_id(id: int, session: AsyncSession):
+    '''Удаление пользователя по id'''
+
+    user = await get_user_by_id(id, session)
+    await session.delete(user)
+    await session.commit()
+    return 'Пользователь удален'
+
+
+
+
+
+
 async def delete_and_create_database(sesison: AsyncSession):
     '''Удаление и создание базы данных'''
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
