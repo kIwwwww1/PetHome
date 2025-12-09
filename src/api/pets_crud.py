@@ -29,9 +29,10 @@ async def get_pet(pet_id: int, session: SessionDep):
     return {'message': resp}
 
 
-# @dog_router.post('/random-pet/{pet_id}')
 @dog_router.post('/random-pet')
 async def get_random_pet_id(species: Species, session: SessionDep):
+    '''Перейти на страницу случайного животного'''
+
     random_id = await random_number(species.species, session)
     resp = await get_pet_by_id(random_id, session)
     return {'message': resp}

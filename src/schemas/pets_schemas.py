@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import BaseModel, Field
 
-Species_list = Literal['Dog', 'Cat']
+Species_list = Literal['Dog', 'dog', 'Cat', 'cat']
 
 class Species(BaseModel):
     species: Species_list

@@ -12,14 +12,18 @@ from src.schemas.pets_schemas import Pets
 from src.services.auth import get_token_from_cookie
 from src.exception import PetNotFound
 
-async def get_len_data_in_species(species, session: AsyncSession):
+async def get_len_data_in_species(species: str, session: AsyncSession):
+    '''Получение количества записей в бд по конкретному виду'''
+
     max_len = (await session.execute(
                             select(func.count()).
                             select_from(Pet).
-                            filter_by(species=species))).scalar_one()
+                            filter_by(species=species.capitalize()))).scalar_one()
     return max_len
 
 async def random_number(species, session: AsyncSession):
+    '''Получение случайного числа'''
+
     _max = await get_len_data_in_species(species, session)
     random_id = randint(1, _max)
     return random_id
