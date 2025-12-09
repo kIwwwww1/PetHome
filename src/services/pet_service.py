@@ -7,19 +7,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.models import Pet, PetPhoto
 from src.schemas.pets_schemas import (Pets, ChangeName, ChangeBreed, ChangeDescription,
                                       ChangePrice, ChangeLocation)
-
 from src.schemas.pets_schemas import Pets
 from src.services.auth import get_token_from_cookie
 from src.exception import PetNotFound
 
+
 async def get_len_data_in_species(species: str, session: AsyncSession):
     '''Получение количества записей в бд по конкретному виду'''
+    try:
+        max_len = (await session.execute(
+                                select(func.count()).
+                                select_from(Pet).
+                                filter_by(species=species.capitalize()))).scalar_one()
+        if max_len: 
+            return max_len
+        raise
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Животное не найдено')
 
-    max_len = (await session.execute(
-                            select(func.count()).
-                            select_from(Pet).
-                            filter_by(species=species.capitalize()))).scalar_one()
-    return max_len
 
 async def random_number(species, session: AsyncSession):
     '''Получение случайного числа'''
@@ -27,7 +32,6 @@ async def random_number(species, session: AsyncSession):
     _max = await get_len_data_in_species(species, session)
     random_id = randint(1, _max)
     return random_id
-
 
 
 async def create_pet_for_sale(pet: Pets, request: Request, session: AsyncSession):
@@ -81,6 +85,7 @@ async def delete_user_pet_in_db(pet_id: int, request: Request, session: AsyncSes
     await session.commit()
     return 'Питомец удален'
 
+
 async def update_name_pet_id_db(pet_id: int, new_name: str, 
                                 request: Request, session: AsyncSession):
     pet_for_update = await user_id_and_owner_id(pet_id, request, session)
@@ -90,6 +95,7 @@ async def update_name_pet_id_db(pet_id: int, new_name: str,
         return 'Вы сменили имя'
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail='Не удалось сменить имя')
+
 
 async def update_breed_pet_id_db(pet_id: int, new_breed: str, 
                                 request: Request, session: AsyncSession):

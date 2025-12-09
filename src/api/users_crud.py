@@ -17,7 +17,8 @@ user_router = APIRouter(prefix='/users', tags=['Пользователи'])
 
 
 @user_router.post('/create-account')
-async def create_user(new_user: NewUser, session: SessionDep, response: Response):
+async def create_user(new_user: NewUser, session: SessionDep, 
+                      response: Response):
     '''Регистрация пользователя'''
 
     resp = await add_user_in_db(new_user, session, response)
@@ -25,15 +26,19 @@ async def create_user(new_user: NewUser, session: SessionDep, response: Response
 
 
 @user_router.post('/login-account')
-async def login_account(user_data: UserData, response: Response, session: SessionDep):
+async def login_account(user_data: UserData, response: Response, 
+                        session: SessionDep):
     '''авторизация пользователя'''
 
-    resp = await verification_user_data(user_data.email, user_data.password, response, session)
+    resp = await verification_user_data(user_data.email, 
+                                        user_data.password, 
+                                        response, session)
     return {'message': resp}
 
 
 @user_router.get('/logout-account')
-async def logout_user(response: Response, auth: AuthorizationCheckDep, session: SessionDep):
+async def logout_user(response: Response, auth: AuthorizationCheckDep, 
+                      session: SessionDep):
     '''Выход из аккаунта'''
 
     resp = await delete_token_from_cookie(response)

@@ -12,6 +12,7 @@ from src.services.pet_service import (create_pet_for_sale, delete_user_pet_in_db
 
 dog_router = APIRouter(prefix='/dogs', tags=['Собаки'])
 
+
 @dog_router.post('/create-pet')
 async def create_dog(dog_for_add: Pets, auth: AuthorizationCheckDep, 
                      request: Request, session: SessionDep):
@@ -46,6 +47,7 @@ async def change_name_in_pet(pet_id: int, new_name: ChangeName,
     resp = await update_name_pet_id_db(pet_id, str(new_name.name), request, session)
     return {'message': resp}
 
+
 @dog_router.patch('/{pet_id}/update-breed')
 async def change_breed_in_pet(pet_id: int, new_breed: ChangeBreed, 
                              request: Request, session: SessionDep):
@@ -53,6 +55,7 @@ async def change_breed_in_pet(pet_id: int, new_breed: ChangeBreed,
 
     resp = await update_breed_pet_id_db(pet_id, str(new_breed.breed), request, session)
     return {'message': resp}
+
 
 @dog_router.patch('/{pet_id}/update-description')
 async def change_description_in_pet(pet_id: int, new_description: ChangeDescription, 
