@@ -14,6 +14,7 @@ from src.exception import PetNotFound
 
 async def get_len_data_in_species(species: str, session: AsyncSession):
     '''Получение количества записей в бд по конкретному виду'''
+    
     try:
         max_len = (await session.execute(
                                 select(func.count()).
