@@ -10,6 +10,7 @@ from src.schemas.users_schemas import NewUser, UserData, ContactPhone
 from src.services.auth import (hashed_password, add_token, 
                                password_verification, update_verified_in_cookie,
                                delete_token_from_cookie)
+from src.services.pet_service import get_pet_by_id
 from src.exception import (IsNotCorrectData, PhoneExists, 
                            TelegramExists, UserIsNotAdmin)
 from src.models.models import Base
@@ -60,6 +61,13 @@ async def delete_user_accunt_by_id(id: int, session: AsyncSession):
     return 'Пользователь удален'
 
 
+async def delete_user_pet_by_id(pet_id: int, session: AsyncSession):
+    '''Удаление животного у пользователя по id питомца'''
+
+    pet_for_delete = await get_pet_by_id(pet_id, session)
+    await session.delete(pet_for_delete)
+    await session.commit()
+    return 'Питомец удален'
 
 
 
